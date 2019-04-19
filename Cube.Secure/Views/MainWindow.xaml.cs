@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cube.Secure.ViewModel;
 using MahApps.Metro.Controls;
 
 namespace Cube.Secure
@@ -21,9 +22,17 @@ namespace Cube.Secure
     /// </summary>
     public partial class MainWindow
     {
+        public AesViewModel AesViewModel { get; set; }
         public MainWindow()
         {
             InitializeComponent();
+            this.AesViewModel = (AesViewModel)this.AesTab.DataContext;
+
+        }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e)
+        {
+            this.AesViewModel.WindowCloseCommand.Execute(this);
         }
     }
 }
