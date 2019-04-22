@@ -72,7 +72,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="ViewModel\AesViewModel.cs" />
+    <Compile Include="ViewModel\FileBrowserItem.cs" />
     <Compile Include="Views\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -109,5 +111,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

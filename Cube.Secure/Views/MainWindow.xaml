@@ -56,7 +56,15 @@
                     </Grid>
 
                     <Grid Grid.Row="1" Grid.Column="1">
-                        <ListView Margin="5"></ListView>
+                        <ListView Margin="5" ItemsSource="{Binding Path=FileBrowserItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderBrush="White" BorderThickness="1">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="True">
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsDirectory}" Width="50"></GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Width="300" Header="File name"></GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Size}" Width="100" Header="File size"></GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
                     </Grid>
                 </Grid>
             </TabItem>

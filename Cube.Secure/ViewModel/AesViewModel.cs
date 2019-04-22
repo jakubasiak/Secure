@@ -31,6 +31,28 @@ namespace Cube.Secure.ViewModel
                 this.OnPropertyChanged(nameof(this.FolderPath));
             }
         }
+
+        private string currentDirectory;
+        public string CurrentDirectory
+        {
+            get => this.currentDirectory;
+            set
+            {
+                this.currentDirectory = value;
+                this.OnPropertyChanged(nameof(this.CurrentDirectory));
+            }
+        }
+
+        private List<FileBrowserItem> fileBrowserItems;
+        public List<FileBrowserItem> FileBrowserItems
+        {
+            get => this.fileBrowserItems;
+            set
+            {
+                this.fileBrowserItems = value;
+                this.OnPropertyChanged(nameof(this.FileBrowserItems));
+            }
+        }
         #endregion
 
         #region Commands
@@ -134,7 +156,38 @@ namespace Cube.Secure.ViewModel
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));        
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+            if (propertyName == nameof(this.CurrentDirectory))
+            {
+                var directoryInfo = new DirectoryInfo(this.CurrentDirectory);
+
+                var folders = directoryInfo.GetDirectories().Select(dir => new FileBrowserItem()
+                {
+                    Path = dir.FullName,
+                    Name = dir.Name,
+                    Size = 0,
+                    IsDirectory = true
+                });
+
+                var files = directoryInfo.GetFiles().Select(file => new FileBrowserItem()
+                {
+                    Path = file.FullName,
+                    Name = file.Name,
+                    Size = file.Length,
+                    IsDirectory = false
+                });
+
+                this.FileBrowserItems = folders.Concat(files)
+                    .OrderByDescending(x => x.IsDirectory)
+                    .ThenBy(x => x.Name)
+                    .ToList();
+            }
+
+            if (propertyName == nameof(this.FolderPath))
+            {
+                this.CurrentDirectory = this.FolderPath;
+            }
         }
         #endregion
     }
