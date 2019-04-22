@@ -6,12 +6,16 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:Cube.Secure"
         xmlns:vm="clr-namespace:Cube.Secure.ViewModel"
+        xmlns:c="clr-namespace:Cube.Secure.Converters"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Secure" Height="450" Width="800"
                       Closed="MainWindow_OnClosed">
     <Controls:MetroWindow.Resources>
         <vm:AesViewModel x:Key="AesViewModel" />
+        <c:FileSizeToStringConverter x:Key="FileSizeToStringConverter" />
+        <c:BoolToFileIconConverter x:Key="BoolToFileIconConverter" />
     </Controls:MetroWindow.Resources>
     <Grid>
         <Controls:MetroAnimatedSingleRowTabControl>
@@ -59,9 +63,15 @@
                         <ListView Margin="5" ItemsSource="{Binding Path=FileBrowserItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderBrush="White" BorderThickness="1">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="True">
-                                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsDirectory}" Width="50"></GridViewColumn>
-                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Width="300" Header="File name"></GridViewColumn>
-                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Size}" Width="100" Header="File size"></GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsDirectory}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label fa:Awesome.Content="" FontSize="15"></Label>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Width="350" Header="File name"></GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Path=Size, Converter={StaticResource FileSizeToStringConverter}}" Width="100" Header="File size"></GridViewColumn>
                                 </GridView>
                             </ListView.View>
                         </ListView>

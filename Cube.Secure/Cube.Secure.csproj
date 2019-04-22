@@ -72,6 +72,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Converters\BoolToFileIconConverter.cs" />
     <Compile Include="Converters\FileSizeToStringConverter.cs" />
     <Compile Include="ViewModel\AesViewModel.cs" />
     <Compile Include="ViewModel\FileBrowserItem.cs" />
