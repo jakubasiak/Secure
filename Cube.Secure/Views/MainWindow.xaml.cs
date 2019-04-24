@@ -34,5 +34,15 @@ namespace Cube.Secure
         {
             this.AesViewModel.WindowCloseCommand.Execute(this);
         }
+
+        private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            this.AesViewModel.FileBorwserDoubleClick.Execute(e);
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.AesViewModel.SelectedItems = ((ListView) sender).SelectedItems.Cast<FileBrowserItem>().ToList();
+        }
     }
 }

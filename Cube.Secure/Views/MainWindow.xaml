@@ -60,16 +60,10 @@
                     </Grid>
 
                     <Grid Grid.Row="1" Grid.Column="1">
-                        <ListView Margin="5" ItemsSource="{Binding Path=FileBrowserItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" BorderBrush="White" BorderThickness="1">
+                        <ListView Margin="5" ItemsSource="{Binding Path=FileBrowserItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MouseDoubleClick="Control_OnMouseDoubleClick" SelectedItem="{Binding Path=SelectedItem}" SelectionChanged="Selector_OnSelectionChanged">
                             <ListView.View>
                                 <GridView AllowsColumnReorder="True">
-                                    <GridViewColumn DisplayMemberBinding="{Binding Path=IsDirectory}">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Label fa:Awesome.Content="" FontSize="15"></Label>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding IsDirectory, Converter={StaticResource BoolToFileIconConverter }}"></GridViewColumn>
                                     <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Width="350" Header="File name"></GridViewColumn>
                                     <GridViewColumn DisplayMemberBinding="{Binding Path=Size, Converter={StaticResource FileSizeToStringConverter}}" Width="100" Header="File size"></GridViewColumn>
                                 </GridView>

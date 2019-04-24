@@ -7,9 +7,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Cube.Secure.Commands;
+using Cube.Secure.Views;
 using Microsoft.Win32;
 
 namespace Cube.Secure.ViewModel
@@ -53,6 +55,28 @@ namespace Cube.Secure.ViewModel
                 this.OnPropertyChanged(nameof(this.FileBrowserItems));
             }
         }
+
+        private FileBrowserItem selectedItem;
+        public FileBrowserItem SelectedItem
+        {
+            get => this.selectedItem;
+            set
+            {
+                this.selectedItem = value;
+                this.OnPropertyChanged(nameof(this.SelectedItem));
+            }
+        }
+
+        private List<FileBrowserItem> selectedItems;
+        public List<FileBrowserItem> SelectedItems
+        {
+            get => this.selectedItems;
+            set
+            {
+                this.selectedItems = value;
+                this.OnPropertyChanged(nameof(this.SelectedItems));
+            }
+        }
         #endregion
 
         #region Commands
@@ -86,7 +110,12 @@ namespace Cube.Secure.ViewModel
                 return this.encryptCommand ?? (this.encryptCommand = new RelayCommand(
                            x =>
                            {
+                               var password = GetPasswordFromUser();
 
+                               if (!string.IsNullOrEmpty(password))
+                               {
+
+                               }
                            }
                        ));
             }
@@ -149,6 +178,21 @@ namespace Cube.Secure.ViewModel
                        ));
             }
         }
+
+        private ICommand fileBorwserDoubleClick;
+        public ICommand FileBorwserDoubleClick
+        {
+            get
+            {
+                return this.fileBorwserDoubleClick ?? (this.fileBorwserDoubleClick = new RelayCommand(
+                           x =>
+                           {
+                               if(this.SelectedItem.IsDirectory)
+                                    this.FolderPath = this.selectedItem.Path;
+                           }
+                       ));
+            }
+        }
         #endregion
 
         #region Methods
@@ -162,13 +206,22 @@ namespace Cube.Secure.ViewModel
             {
                 var directoryInfo = new DirectoryInfo(this.CurrentDirectory);
 
+                var back = new FileBrowserItem()
+                {
+                    Path = directoryInfo.Parent.FullName,
+                    Name = "...",
+                    Size = 0,
+                    IsDirectory = true
+                };
+
                 var folders = directoryInfo.GetDirectories().Select(dir => new FileBrowserItem()
                 {
                     Path = dir.FullName,
                     Name = dir.Name,
                     Size = 0,
                     IsDirectory = true
-                });
+                }).ToList();
+                folders.Add(back);
 
                 var files = directoryInfo.GetFiles().Select(file => new FileBrowserItem()
                 {
@@ -176,11 +229,11 @@ namespace Cube.Secure.ViewModel
                     Name = file.Name,
                     Size = file.Length,
                     IsDirectory = false
-                });
+                }).ToList();
 
                 this.FileBrowserItems = folders.Concat(files)
                     .OrderByDescending(x => x.IsDirectory)
-                    .ThenBy(x => x.Name)
+                    .ThenBy(x => x.Name)                    
                     .ToList();
             }
 
@@ -188,6 +241,20 @@ namespace Cube.Secure.ViewModel
             {
                 this.CurrentDirectory = this.FolderPath;
             }
+        }
+
+        private static string GetPasswordFromUser()
+        {
+            PasswordWindow passwordWindow = new PasswordWindow();
+            passwordWindow.ShowDialog();
+            var passwordWindowViewModel = passwordWindow.DataContext as PasswordViewModel;
+            string password;
+            if (passwordWindowViewModel != null)
+            {
+                return password = passwordWindowViewModel.Password;
+            }
+
+            return null;
         }
         #endregion
     }
