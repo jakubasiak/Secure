@@ -73,14 +73,14 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Margin="1">
+            <!--<TabItem Margin="1">
                 <TabItem.Header>
                     <TextBlock Margin="5">RSA</TextBlock>
                 </TabItem.Header>
                 <Grid Margin="10">
                     <TextBlock>Second Tab</TextBlock>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
         </Controls:MetroAnimatedSingleRowTabControl>
     </Grid>
 </Controls:MetroWindow>
