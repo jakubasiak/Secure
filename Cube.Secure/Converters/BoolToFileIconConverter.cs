@@ -13,7 +13,7 @@ namespace Cube.Secure.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var isDirectory = (bool) value;
-            return isDirectory ? "Folder" : "File";
+            return isDirectory ? "Dir" : "File";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

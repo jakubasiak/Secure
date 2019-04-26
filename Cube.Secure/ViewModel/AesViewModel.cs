@@ -11,6 +11,8 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Cube.Secure.Commands;
+using Cube.Secure.Model;
+using Cube.Secure.ViewModel;
 using Cube.Secure.Views;
 using Microsoft.Win32;
 
@@ -23,6 +25,19 @@ namespace Cube.Secure.ViewModel
             this.FolderPath = Properties.Settings.Default.FolderPath;
         }
         #region Properties
+        private AES aes;
+        public AES Aes
+        {
+            get
+            {
+                if (this.aes == null)
+                {
+                    this.aes = new AES();
+                }
+                return this.aes;
+            }
+        }
+
         private string folderPath;
         public string FolderPath
         {
@@ -112,9 +127,16 @@ namespace Cube.Secure.ViewModel
                            {
                                var password = GetPasswordFromUser();
 
-                               if (!string.IsNullOrEmpty(password))
+                               if (!string.IsNullOrEmpty(password) && this.SelectedItems.Count > 0)
                                {
+                                   var allFilePaths = this.GetAllFilePaths();
 
+                                   foreach (var path in allFilePaths)
+                                   {
+                                       var file = File.ReadAllBytes(path);
+                                       var encryptedFile = this.Aes.Encrypt(file, password);
+                                       File.WriteAllBytes(path, encryptedFile);
+                                   }
                                }
                            }
                        ));
@@ -129,7 +151,23 @@ namespace Cube.Secure.ViewModel
                 return this.encryptWithFileNamesCommand ?? (this.encryptWithFileNamesCommand = new RelayCommand(
                            x =>
                            {
+                               var password = GetPasswordFromUser();
 
+                               if (!string.IsNullOrEmpty(password) && this.SelectedItems.Count > 0)
+                               {
+                                   var allFilePaths = this.GetAllFilePaths();
+
+                                   foreach (var path in allFilePaths)
+                                   {
+                                       var file = File.ReadAllBytes(path);
+                                       var encryptedFile = this.Aes.Encrypt(file, password);
+                                       var encryptedFileName = this.GetEncryptedFileName(path, password);
+                                       File.WriteAllBytes(encryptedFileName, encryptedFile);
+                                       File.Delete(path);
+
+                                       this.OnPropertyChanged(nameof(this.CurrentDirectory));
+                                   }
+                               }
                            }
                        ));
             }
@@ -143,7 +181,19 @@ namespace Cube.Secure.ViewModel
                 return this.decryptCommand ?? (this.decryptCommand = new RelayCommand(
                            x =>
                            {
+                               var password = GetPasswordFromUser();
 
+                               if (!string.IsNullOrEmpty(password) && this.SelectedItems.Count > 0)
+                               {
+                                   var allFilePaths = this.GetAllFilePaths();
+
+                                   foreach (var path in allFilePaths)
+                                   {
+                                       var file = File.ReadAllBytes(path);
+                                       var decryptedFile = this.Aes.Decrypt(file, password);
+                                       File.WriteAllBytes(path, decryptedFile);
+                                   }
+                               }
                            }
                        ));
             }
@@ -157,7 +207,23 @@ namespace Cube.Secure.ViewModel
                 return this.decryptWithFileNamesCommand ?? (this.decryptWithFileNamesCommand = new RelayCommand(
                            x =>
                            {
+                               var password = GetPasswordFromUser();
 
+                               if (!string.IsNullOrEmpty(password) && this.SelectedItems.Count > 0)
+                               {
+                                   var allFilePaths = this.GetAllFilePaths();
+
+                                   foreach (var path in allFilePaths)
+                                   {
+                                       var file = File.ReadAllBytes(path);
+                                       var decryptedFile = this.Aes.Decrypt(file, password);
+                                       var decryptedFileName = this.GetDecryptedFileName(path, password);
+                                       File.WriteAllBytes(decryptedFileName, decryptedFile);
+                                       File.Delete(path);
+
+                                       this.OnPropertyChanged(nameof(this.CurrentDirectory));
+                                   }
+                               }
                            }
                        ));
             }
@@ -255,6 +321,46 @@ namespace Cube.Secure.ViewModel
             }
 
             return null;
+        }
+
+        private List<string> GetAllFilePaths()
+        {
+            var allFilePaths = new List<string>();
+
+            foreach (var item in this.SelectedItems)
+            {
+                if (item.IsDirectory)
+                {
+                    allFilePaths.AddRange(Directory.GetFiles(item.Path, "*.*",
+                        SearchOption.AllDirectories));
+                }
+                else
+                {
+                    allFilePaths.Add(item.Path);
+                }
+            }
+
+            return allFilePaths;
+        }
+
+        private string GetEncryptedFileName(string path, string password)
+        {
+            var filePath = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            var bytesFileName = Encoding.UTF8.GetBytes(fileName);
+            var encryptedFileName = Convert.ToBase64String(bytesFileName);
+
+            return filePath + Path.DirectorySeparatorChar + encryptedFileName;
+        }
+
+        private string GetDecryptedFileName(string path, string password)
+        {
+            var filePath = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            var bytesFileName = Convert.FromBase64String(fileName);
+            var decryptedFileName = Encoding.UTF8.GetString(bytesFileName);
+
+            return filePath + Path.DirectorySeparatorChar + decryptedFileName;
         }
         #endregion
     }

@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using Cube.Secure.Commands;
 
 namespace Cube.Secure.ViewModel
 {
@@ -24,7 +27,19 @@ namespace Cube.Secure.ViewModel
         #endregion
 
         #region Commands
-        
+        private ICommand windowCloseCommand;
+        public ICommand WindowCloseCommand
+        {
+            get
+            {
+                return this.windowCloseCommand ?? (this.windowCloseCommand = new RelayCommand(
+                           x =>
+                           {
+                               ((Window)x).Close();
+                           }
+                       ));
+            }
+        }
         #endregion
 
         #region Methods
